@@ -24,17 +24,28 @@ const ProductForm = ({ product, onSave, onCancel }) => {
       const url = product ? `${API_BASE}/products/${product.id}` : `${API_BASE}/products`;
       const method = product ? 'PUT' : 'POST';
       
+      console.log('Submitting product:', formData); // Debug log
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
       
+      console.log('Response status:', response.status); // Debug log
+
       if (response.ok) {
+        const result = await response.json();
+        console.log('Success:', result); // Debug log
         onSave();
+      } else {
+        const error = await response.json();
+        console.error('Server error:', error);
+        alert(`Error: ${error.error || 'Failed to save product'}`);
       }
     } catch (error) {
       console.error('Error saving product:', error);
+      alert(`Network error: ${error.message}`);
     }
   };
 
@@ -248,20 +259,33 @@ const App = () => {
   const loadProducts = async () => {
     try {
       const response = await fetch(`${API_BASE}/products`);
-      const data = await response.json();
-      setProducts(data);
+      if (response.ok) {
+        const data = await response.json();
+        // Asegurar que data es un array
+        setProducts(Array.isArray(data) ? data : []);
+      } else {
+        console.error('Server error:', response.status);
+        setProducts([]); // Mantener array vacío en caso de error
+      }
     } catch (error) {
       console.error('Error loading products:', error);
+      setProducts([]); // Mantener array vacío en caso de error
     }
   };
 
   const loadStats = async () => {
     try {
       const response = await fetch(`${API_BASE}/stats`);
-      const data = await response.json();
-      setStats(data);
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data || {});
+      } else {
+        console.error('Server error:', response.status);
+        setStats({});
+      }
     } catch (error) {
       console.error('Error loading stats:', error);
+      setStats({});
     }
   };
 

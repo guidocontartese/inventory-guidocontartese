@@ -1,0 +1,11 @@
+# Archivos a ignorar para Elastic Beanstalk
+node_modules/
+.git/
+*.zip
+.DS_Store
+.env.local
+.env.development
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
